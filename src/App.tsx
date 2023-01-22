@@ -4,12 +4,27 @@ import "./App.css"
 import { Badges } from "./types/badgesTypes"
 import { Chapter, Data, Datum } from "./types/chaptersTypes"
 import { City } from "./types/cityType"
+import { fetchCount } from "./features/counter/counterAPI"
 
 function App() {
   const [data, setData] = useState<Badges[]>([])
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [cities, setCities] = useState<City[]>([])
   const [progress, setProgress] = useState<Datum[]>([])
+
+  const [user, setUser] = useState<any>()
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await fetch(
+        "https://accounts.travpromobile.com/api/v2/get_user/?email=chrisvanworkum@gmail.com&app_id=787"
+      )
+      const data = await response.json()
+      setUser(data.response)
+    }
+    fetchUser()
+  }, [])
+
 
   useEffect(() => {
     const fetchBarges = async () => {
@@ -52,9 +67,11 @@ function App() {
 
   const firstFourChapters = chapters.slice(0, 4)
 
-  const totalCompletedChapters = chapters.filter(
+  const completedChapters = chapters.filter(
     (chapter) => chapter.progress === chapter.total_pages
-  ).length
+  )
+
+  const totalCompletedChapters = completedChapters.length
 
   const openBronze =
     firstFourChapters.filter(
@@ -67,6 +84,9 @@ function App() {
 
   console.log(openSilver)
   console.log(openBronze)
+
+  // get sessions based on completed chapters
+  const completedSessions = chapters
 
   if (data.length === 0) return <div>Loading...</div>
 
@@ -189,7 +209,7 @@ function App() {
 
       {/* certificate */}
       <div className="certificate">
-        {showCertificate ? "show certificate" : "no certificate"}
+        <h1>{showCertificate ? "show certificate" : "no certificate"}</h1>
       </div>
     </div>
   )
